@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Dcblogdev\Xero\Facades\Xero;
+use App\Http\Controllers\XeroController;
+use App\Http\Controllers\VendController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -17,11 +19,20 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth'])->name('dashboard');
+
+require __DIR__.'/auth.php';
+
+
+//Xero Integration
+Route::get('xero/connect',[XeroController::class,'index']);
+
 Route::group(['middleware' => ['web', 'XeroAuthenticated']], function(){
-    Route::get('xero', function(){
-        return Xero::get('Invoices');
-    });
+    Route::get('xero', [XeroController::class,'result']);
 });
-Route::get('xero/connect', function(){
-    return Xero::connect();
-});
+
+//Vend Integration
+Route::get('/vend',[VendController::class,'index']);
+Route::get('vend/connect',[VendController::class,'callback']);
